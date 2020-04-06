@@ -13,9 +13,9 @@ contains
        d_kernal = -1*(3./4)*(2-q)**2 + 3*(1-q)**2
 
      else if (q.GE.1 .and. q.LT.2) then
-       d_kernal = -1*(3./4)*(2-q)**2
+       d_kernal = -(3./4.)*(2.-q)**2
      else
-       d_kernal = 0
+       d_kernal = 0.
      end if
 
      d_kernal = d_kernal*(2./3)
@@ -32,7 +32,7 @@ contains
        viscosity = -0.5*rho*v_sig*v_ab*u_vec
 
      else
-       viscosity = 0
+       viscosity = 0.
 
     end if
 
@@ -44,7 +44,7 @@ contains
     real, intent(inout) :: blob(:,:)
     integer, intent(in) :: n, n_ghosts
     real, intent(out) :: dt_new
-    real, parameter :: alpha = 1, beta = 2
+    real, parameter :: alpha = 1., beta = 2.
 
     integer :: a, b
     real :: acc
@@ -62,7 +62,8 @@ contains
       h_a = blob(a, 4)
       u_a = blob(a, 6)
 
-      blob(a, 9) = 0
+      blob(a, 9) = 0.
+      blob(a, 10) = 0.
 
 
       do b=1,n+n_ghosts
@@ -76,13 +77,13 @@ contains
 
         if (b.NE.a) then
 
-          acc = 0
+          acc = 0.
 
           u_vec = (ra - rb)/abs(ra - rb)
           v_ab = va - vb
 
-          q_a = abs(rb-ra)/h_a
-          q_b = abs(rb-ra)/h_b
+          q_a = abs(ra-rb)/h_a
+          q_b = abs(ra-rb)/h_b
 
           v_sig_a = alpha*cs_a - beta*v_ab*u_vec
           v_sig_b = alpha*cs_b - beta*v_ab*u_vec
@@ -98,9 +99,10 @@ contains
 
           acc = -1*m_b*(term_a*d_wa + term_b*d_wb)
 
-          du_dt = 0
+
           term_3 = (pr_a + vis_a)/rho_a**2
-          du_dt = m_b*term_3*v_ab*d_kernal(q_a)
+
+          du_dt = m_b*term_3*v_ab*d_wa
 
         else
           acc = 0

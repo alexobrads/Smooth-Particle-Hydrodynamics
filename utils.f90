@@ -39,32 +39,34 @@ contains
     integer :: i, n_l, n_r
     real :: x, rho_l, rho_r, dx_l, dx_r
     real :: middle, xmax, xmin, mass, pr, pl, ss
+    real :: u_l, u_r
 
     if (gamma>1.) then
       rho_l = 1.
       rho_r = 0.125
-
       pl = 1.
       pr = 0.1
-
       ss = 1.
-
       dx_l = 0.001
       dx_r = 0.008
-      mass = dx_l
+      mass = rho_l*dx_l
+      u_r = pr/((gamma - 1)*rho_r)
+      u_l = pl/((gamma - 1)*rho_l)
+      print*, 'adiabatic'
 
     else
       rho_l = 1.
       rho_r = 0.1
-
-      pr = 1.
+      pr = 0.1
       pl = 1.
-
       ss = 1.
-
       dx_l = 0.001
       dx_r = 0.01
       mass = dx_l
+      u_r = 1
+      u_l = 1
+      print*, 'iso'
+
 
     endif
 
@@ -72,8 +74,9 @@ contains
     xmax = 0.5
     middle = 0
 
-    n_l = nint(abs(xmax)/dx_l)  !500
-    n_r = nint(abs(xmin)/dx_r)  !50
+    n_l = int(abs(xmax)/dx_l)  !500
+    n_r = int(abs(xmin)/dx_r)
+    print*, n_l, n_r   !50
 
     n = 2*n_l + 2*n_r
 
@@ -86,7 +89,7 @@ contains
       blob(i, 3) = mass
       blob(i, 4) = 1.2*dx_l
       blob(i, 5) = rho_l
-      blob(i, 6) = 0.
+      blob(i, 6) = u_l
       blob(i, 7) = pl
       blob(i, 8) = ss
       blob(i, 9) = 0.
@@ -104,7 +107,7 @@ contains
       blob(i, 3) = mass
       blob(i, 4) = 1.2*dx_r
       blob(i, 5) = rho_r
-      blob(i, 6) = 0.
+      blob(i, 6) = u_r
       blob(i, 7) = pr
       blob(i, 8) = ss
       blob(i, 9) = 0.
@@ -122,7 +125,7 @@ contains
       blob(i, 3) = mass
       blob(i, 4) = 1.2*dx_l
       blob(i, 5) = rho_l
-      blob(i, 6) = 0.
+      blob(i, 6) = u_l
       blob(i, 7) = pl
       blob(i, 8) = ss
       blob(i, 9) = 0.
@@ -138,7 +141,7 @@ contains
       blob(i, 3) = mass
       blob(i, 4) = 1.2*dx_r
       blob(i, 5) = rho_r
-      blob(i, 6) = 0.
+      blob(i, 6) = u_r
       blob(i, 7) = pr
       blob(i, 8) = ss
       blob(i, 9) = 0.
@@ -155,15 +158,14 @@ contains
     implicit none
     !integer, intent(in) :: n_ghosts
     integer, intent(in) :: n
-    real, intent(in) :: blob(:,:)
-    real, intent(in) :: dt
+    real, intent(in) :: blob(:,:), dt
     character(len=100) :: filename
     integer :: j
 
     write(filename, "(a,i5.5)") 'snap_',icount
 
     open(1, file=filename, status='replace')
-    write(1,*) '# x, v, m, sl, p, u, P, ss, acc, du_dt'
+    write(1,*) '# x, v_x, m, sl, rho, u, P, ss, a, du_dt'
     write(1,*) dt
     do j=1,n
       write(1,*) blob(j,1), blob(j,2), blob(j,3), blob(j,4), &

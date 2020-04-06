@@ -16,9 +16,9 @@ program SPH_method
   real :: time, dt, dt_new
 
   !call setup_wave(blob, n)
-  call setup_sod_shock_tube(blob, n)
+  call setup_shock_tube(blob, n)
   call get_derivs(blob, n, ng, dt)
-  call output(blob, out_n, tmin)
+  call output(blob, n+ng, tmin)
 
   i = 0
   time = tmin
@@ -28,14 +28,15 @@ program SPH_method
     call do_step(blob, n, ng, dt, dt_new)
     dt = dt_new
     time = time + dt
-    print*, time
+    ! print*, time
     t(i) = time
     ke(i) = sum(0.5*blob(:n, 2) + blob(:n, 2)**2)
 
 
     if (mod(i, 10)==0) then
-      call output(blob, out_n, time)
+      call output(blob, n+ng, time)
       t(i) = time
+      print*,time
       ke(i) = sum(0.5*blob(:n, 2) + blob(:n, 2)**2)
     endif
   enddo

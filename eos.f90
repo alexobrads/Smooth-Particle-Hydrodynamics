@@ -12,6 +12,7 @@ contains
 
     else
       call adiabatic_eos(blob)
+      ! print*, "ad"
 
     endif
 
@@ -20,7 +21,7 @@ contains
   subroutine iso_eos(blob)
     real, intent(inout) :: blob(:,:)
     !pressure = (density)*(sound speed)**2
-    print*, 'isothermal'
+    !print*, 'isothermal'
     blob(:, 7) = (blob(:, 5))*(blob(:, 8)**2)
 
   end subroutine iso_eos
@@ -28,9 +29,10 @@ contains
   subroutine adiabatic_eos(blob)
     real, intent(inout) :: blob(:,:)
 
-    print*, 'adiabatic'
-
+    !pressure = (1.4 - 1)*rho*u
     blob(:, 7) = (gamma-1)*blob(:, 5)*blob(:, 6)
+
+    !cs = sqrt(1.4*pressure/rho)
     blob(:, 8) = sqrt(gamma*(blob(:, 7)/blob(:, 5)))
 
   end subroutine adiabatic_eos
