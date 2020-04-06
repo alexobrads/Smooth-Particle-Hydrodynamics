@@ -1,7 +1,9 @@
 module utils
   use memory
   implicit none
-  real, private :: pi = 4.*atan(1.)
+  real, private, parameter :: pi = 4.*atan(1.)
+
+  integer, private :: icount = 0
 
 contains
 
@@ -36,17 +38,35 @@ contains
     real, intent(inout) :: blob(:,:)
     integer :: i, n_l, n_r
     real :: x, rho_l, rho_r, dx_l, dx_r
-    real :: middle, xmax, xmin, mass, pr, ss
+    real :: middle, xmax, xmin, mass, pr, pl, ss
 
-    rho_l = 1.
-    rho_r = 0.1
+    if (gamma>1.) then
+      rho_l = 1.
+      rho_r = 0.125
 
-    pr = 1.
-    ss = 1.
+      pl = 1.
+      pr = 0.1
 
-    dx_l = 0.001
-    dx_r = 0.01
-    mass = dx_l
+      ss = 1.
+
+      dx_l = 0.001
+      dx_r = 0.008
+      mass = dx_l
+
+    else
+      rho_l = 1.
+      rho_r = 0.1
+
+      pr = 1.
+      pl = 1.
+
+      ss = 1.
+
+      dx_l = 0.001
+      dx_r = 0.01
+      mass = dx_l
+
+    endif
 
     xmin = -0.5
     xmax = 0.5
@@ -67,7 +87,7 @@ contains
       blob(i, 4) = 1.2*dx_l
       blob(i, 5) = rho_l
       blob(i, 6) = 0.
-      blob(i, 7) = pr
+      blob(i, 7) = pl
       blob(i, 8) = ss
       blob(i, 9) = 0.
       blob(i, 10) = 0.
@@ -103,7 +123,7 @@ contains
       blob(i, 4) = 1.2*dx_l
       blob(i, 5) = rho_l
       blob(i, 6) = 0.
-      blob(i, 7) = pr
+      blob(i, 7) = pl
       blob(i, 8) = ss
       blob(i, 9) = 0.
       blob(i, 10) = 0.
@@ -130,105 +150,6 @@ contains
   end subroutine setup_shock_tube
 
 
-  subroutine setup_sod_shock_tube(blob, n)
-    integer, intent(out) :: n
-    real, intent(inout) :: blob(:,:)
-    integer :: i, n_l, n_r
-    real :: x, rho_l, rho_r, dx_l, dx_r
-    real :: middle, xmax, xmin, pr_l, pr_r
-
-    rho_l = 1.
-    rho_r = 0.125
-
-    pr_l = 1.
-    pr_r = 0.1
-
-    dx_l = 0.001
-    dx_r = 0.008
-
-    xmin = -0.5
-    xmax = 0.5
-    middle = 0
-
-    n_l = nint(abs(xmax)/dx_l)  !500
-    n_r = nint(abs(xmin)/dx_r)  !50
-
-    n = 2*n_l + 2*n_r
-
-    x = middle
-    do i = 1,n_l
-      !for left hand side start at -0.5 and go to 0
-      x = xmin + (i-0.5)*dx_l
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = dx_l
-      blob(i, 4) = 1.2*dx_l
-      blob(i, 5) = rho_l
-      blob(i, 6) = 0.
-      blob(i, 7) = pr_l
-      blob(i, 8) = 1.
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
-
-    enddo
-
-    x = middle
-    do i = n_l+1, n_l+n_r
-      !for right hand side start at 0 and go to 0.5
-      x = middle + ((i - n_l)-0.5)*dx_r
-
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = dx_l
-      blob(i, 4) = 1.2*dx_r
-      blob(i, 5) = rho_r
-      blob(i, 6) = 0.
-      blob(i, 7) = pr_r
-      blob(i, 8) = 1.
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
-
-    enddo
-
-    !now so we can simplify the ghost part
-    !lets reflect what we have done above around -0.5
-    do i = n_l+n_r+1, 2*n_l+n_r
-      !set the high density part from -0.5 to -1
-      x = blob(1, 1) - ((i - (n_l+n_r)))*dx_l
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = dx_l
-      blob(i, 4) = 1.2*dx_l
-      blob(i, 5) = rho_l
-      blob(i, 6) = 0.
-      blob(i, 7) = pr_l
-      blob(i, 8) = 1.
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
-
-    enddo
-
-    do i = 2*n_l+n_r+1, 2*n_l+2*n_r
-      !set the low density part from -1 to -1.5
-      x = blob(2*n_l+n_r, 1) - ((i - (2*n_l+n_r)))*dx_r
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = dx_l
-      blob(i, 4) = 1.2*dx_r
-      blob(i, 5) = rho_r
-      blob(i, 6) = 0.
-      blob(i, 7) = pr_r
-      blob(i, 8) = 1.
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
-
-    enddo
-
-    !we now have 1100 points
-  end subroutine setup_sod_shock_tube
-
-
-
   subroutine output(blob, n, dt)
 
     implicit none
@@ -239,7 +160,7 @@ contains
     character(len=100) :: filename
     integer :: j
 
-    write(filename, "(a,f8.3)") 'snap_',dt
+    write(filename, "(a,i5.5)") 'snap_',icount
 
     open(1, file=filename, status='replace')
     write(1,*) '# x, v, m, sl, p, u, P, ss, acc, du_dt'
@@ -251,6 +172,8 @@ contains
     enddo
 
     close(1)
+
+    icount = icount+1
 
   end subroutine output
 
