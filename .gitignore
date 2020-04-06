@@ -1,0 +1,8 @@
+*.mod
+*.o
+run
+snap_*
+*.dat
+*.defaults
+*.limits
+*.columns
