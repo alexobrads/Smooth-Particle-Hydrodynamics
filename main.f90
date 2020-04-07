@@ -15,20 +15,16 @@ program SPH_method
   real :: blob(n_max, 10)
   real :: time, dt, dt_new
 
-  !call setup_wave(blob, n)
-  call setup_shock_tube(blob, n)
+  call setup(blob, n)
   call get_derivs(blob, n, ng, dt)
   call output(blob, n+ng, tmin)
-
   i = 0
   time = tmin
   do while (time < tmax)
     i = i + 1
-
     call do_step(blob, n, ng, dt, dt_new)
     dt = dt_new
     time = time + dt
-    ! print*, time
     t(i) = time
     ke(i) = sum(0.5*blob(:n, 2) + blob(:n, 2)**2)
 

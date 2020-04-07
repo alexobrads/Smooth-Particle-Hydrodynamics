@@ -7,6 +7,22 @@ module utils
 
 contains
 
+  subroutine setup(blob, n)
+    integer, intent(inout) :: n
+    real, intent(inout) :: blob(:,:)
+
+    if (problem < 1) then
+
+      call setup_wave(blob, n)
+
+    else
+      call setup_tube(blob, n)
+
+    end if
+
+  end subroutine setup
+
+
   subroutine setup_wave(blob, n)
     integer, intent(inout) :: n
     real, intent(inout) :: blob(:,:)
@@ -33,13 +49,17 @@ contains
   end subroutine setup_wave
 
 
-  subroutine setup_shock_tube(blob, n)
+
+
+  subroutine setup_tube(blob, n)
     integer, intent(out) :: n
     real, intent(inout) :: blob(:,:)
     integer :: i, n_l, n_r
     real :: x, rho_l, rho_r, dx_l, dx_r
     real :: middle, xmax, xmin, mass, pr, pl, ss
-    real :: u_l, u_r
+    real :: u_l, u_r, start, shock, end, new_start
+    integer :: global_count, count_left, new_count_left
+    integer :: count_right, new_count_right
 
     if (gamma>1.) then
       rho_l = 1.
@@ -52,7 +72,6 @@ contains
       mass = rho_l*dx_l
       u_r = pr/((gamma - 1)*rho_r)
       u_l = pl/((gamma - 1)*rho_l)
-      print*, 'adiabatic'
 
     else
       rho_l = 1.
@@ -62,95 +81,139 @@ contains
       ss = 1.
       dx_l = 0.001
       dx_r = 0.01
-      mass = dx_l
-      u_r = 1
-      u_l = 1
-      print*, 'iso'
+      mass = rho_l*dx_l
+      u_r = 1.
+      u_l = 1.
 
 
     endif
 
-    xmin = -0.5
-    xmax = 0.5
-    middle = 0
 
-    n_l = int(abs(xmax)/dx_l)  !500
-    n_r = int(abs(xmin)/dx_r)
-    print*, n_l, n_r   !50
 
-    n = 2*n_l + 2*n_r
+    global_count = 1
 
-    x = middle
-    do i = 1,n_l
-      !for left hand side start at -0.5 and go to 0
-      x = xmin + (i-0.5)*dx_l
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = mass
-      blob(i, 4) = 1.2*dx_l
-      blob(i, 5) = rho_l
-      blob(i, 6) = u_l
-      blob(i, 7) = pl
-      blob(i, 8) = ss
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
 
-    enddo
+    !Set up particles to the right
+    start = 0
+    shock = 0.5
+    end = 1.
 
-    x = middle
-    do i = n_l+1, n_l+n_r
-      !for right hand side start at 0 and go to 0.5
-      x = middle + ((i - n_l)-0.5)*dx_r
+    count_left = 1
+    new_count_left = 1
 
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = mass
-      blob(i, 4) = 1.2*dx_r
-      blob(i, 5) = rho_r
-      blob(i, 6) = u_r
-      blob(i, 7) = pr
-      blob(i, 8) = ss
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
+    x = start
+    do while (x<end)
 
-    enddo
+      if (x<shock) then
+        x = (count_left-0.5)*dx_l
+        if (x>shock) then
 
-    !now so we can simplify the ghost part
-    !lets reflect what we have done above around -0.5
-    do i = n_l+n_r+1, 2*n_l+n_r
-      !set the high density part from -0.5 to -1
-      x = blob(1, 1) - ((i - (n_l+n_r)))*dx_l
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = mass
-      blob(i, 4) = 1.2*dx_l
-      blob(i, 5) = rho_l
-      blob(i, 6) = u_l
-      blob(i, 7) = pl
-      blob(i, 8) = ss
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
+        else
+          blob(global_count, 1) = x
+          blob(global_count, 2) = 0.
+          blob(global_count, 3) = mass
+          blob(global_count, 4) = 1.2*dx_l
+          blob(global_count, 5) = rho_l
+          blob(global_count, 6) = u_l
+          blob(global_count, 7) = pl
+          blob(global_count, 8) = 1.
+          blob(global_count, 9) = 0.
+          blob(global_count, 10) = 0.
 
-    enddo
+          count_left = count_left + 1
+          global_count = global_count + 1
 
-    do i = 2*n_l+n_r+1, 2*n_l+2*n_r
-      !set the low density part from -1 to -1.5
-      x = blob(2*n_l+n_r, 1) - ((i - (2*n_l+n_r)))*dx_r
-      blob(i, 1) = x
-      blob(i, 2) = 0.
-      blob(i, 3) = mass
-      blob(i, 4) = 1.2*dx_r
-      blob(i, 5) = rho_r
-      blob(i, 6) = u_r
-      blob(i, 7) = pr
-      blob(i, 8) = ss
-      blob(i, 9) = 0.
-      blob(i, 10) = 0.
+        endif
+
+      else
+
+        new_start = blob(count_left - 1, 1)
+        x = new_start + (new_count_left)*dx_r
+        if (x>end) then
+
+        else
+          blob(global_count, 1) = x
+          blob(global_count, 2) = 0.
+          blob(global_count, 3) = mass
+          blob(global_count, 4) = 1.2*dx_r
+          blob(global_count, 5) = rho_r
+          blob(global_count, 6) = u_r
+          blob(global_count, 7) = pr
+          blob(global_count, 8) = 1.
+          blob(global_count, 9) = 0.
+          blob(global_count, 10) = 0.
+
+          new_count_left = new_count_left + 1
+          global_count = global_count + 1
+        endif
+
+      endif
 
     enddo
 
-    !we now have 1100 points
-  end subroutine setup_shock_tube
+    !Set up particles to the right
+    start = 0
+    shock = -0.5
+    end = -1.
+
+    count_right = 1
+    new_count_right = 1
+
+    x = start
+    do while (x>end)
+
+      if (x>shock) then
+        x = -1*(count_right-0.5)*dx_l
+        if (x<shock) then
+
+        else
+          blob(global_count, 1) = x
+          blob(global_count, 2) = 0.
+          blob(global_count, 3) = mass
+          blob(global_count, 4) = 1.2*dx_l
+          blob(global_count, 5) = rho_l
+          blob(global_count, 6) = u_l
+          blob(global_count, 7) = pl
+          blob(global_count, 8) = 1.
+          blob(global_count, 9) = 0.
+          blob(global_count, 10) = 0.
+
+          count_right = count_right + 1
+          global_count = global_count + 1
+        endif
+
+      else
+        new_start = blob((count_left+new_count_left+count_right)-3, 1)
+        x = new_start - (new_count_right)*dx_r
+
+        if (x<-1) then
+
+        else
+          blob(global_count, 1) = x
+          blob(global_count, 2) = 0.
+          blob(global_count, 3) = mass
+          blob(global_count, 4) = 1.2*dx_r
+          blob(global_count, 5) = rho_r
+          blob(global_count, 6) = u_r
+          blob(global_count, 7) = pr
+          blob(global_count, 8) = 1.
+          blob(global_count, 9) = 0.
+          blob(global_count, 10) = 0.
+
+          new_count_right = new_count_right + 1
+          global_count = global_count + 1
+        endif
+
+      endif
+
+    enddo
+
+    n = global_count - 1
+
+    blob(:n, 1) = blob(:n, 1)
+
+  end subroutine setup_tube
+
 
 
   subroutine output(blob, n, dt)
@@ -178,6 +241,7 @@ contains
     icount = icount+1
 
   end subroutine output
+
 
 
 end module utils

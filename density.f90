@@ -20,25 +20,24 @@ contains
   end function kernal
 
 
-  subroutine get_density(particles, n, n_ghosts)
+  subroutine get_density(blob, n, ng)
 
-    real, intent(inout) :: particles(:,:)
-    integer, intent(in) :: n, n_ghosts
+    real, intent(inout) :: blob(:,:)
+    integer, intent(inout) :: n, ng
 
     integer :: a, b
     real :: q, rho, h_a, m_b, r_a, r_b
 
     do a=1, n
 
-      particles(a, 5) = 0
+      blob(a, 5) = 0
+      h_a = blob(a, 4)
+      r_a = blob(a,1)
 
-      h_a = particles(a, 4)
-      r_a = particles(a,1)
+      do b=1, n+ng
 
-      do b=1, n+n_ghosts
-
-        m_b = particles(b, 3)
-        r_b = particles(b,1)
+        m_b = blob(b, 3)
+        r_b = blob(b,1)
 
         rho = 0
 
@@ -46,7 +45,12 @@ contains
 
         rho = m_b*(1./h_a)*kernal(q)
 
-        particles(a, 5) = particles(a, 5) + rho
+        blob(a, 5) = blob(a, 5) + rho
+
+        ! if (a>549 .and. a<551) then
+        !
+        !   print*, a, b ,(r_b - r_a) , r_a, r_b, rho, blob(a, 5)
+        ! end if
 
 
       enddo

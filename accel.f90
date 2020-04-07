@@ -117,7 +117,7 @@ contains
 
     enddo
 
-  dt_new = minval(0.2*blob(:n, 4)/blob(:n, 8))
+  dt_new = minval(0.2*blob(1:n, 4)/blob(1:n, 8))
 
   end subroutine get_accel
 
