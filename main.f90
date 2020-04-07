@@ -15,7 +15,10 @@ program SPH_method
   real :: blob(n_max, 10)
   real :: time, dt, dt_new
 
+  print*, "hello world!"
+
   call setup(blob, n)
+  call output(blob, n, tmin)
   call get_derivs(blob, n, ng, dt)
   call output(blob, n+ng, tmin)
   i = 0

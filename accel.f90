@@ -1,4 +1,5 @@
 module calc_accel
+  use memory
   implicit none
 
 
@@ -40,11 +41,11 @@ contains
 
 
 
-  subroutine get_accel(blob, n, n_ghosts, dt_new)
+  subroutine get_accel(blob, n, ng, dt_new)
     real, intent(inout) :: blob(:,:)
-    integer, intent(in) :: n, n_ghosts
+    integer, intent(in) :: n, ng
     real, intent(out) :: dt_new
-    real, parameter :: alpha = 1., beta = 2.
+    real, parameter :: alpha = 2, beta = 1
 
     integer :: a, b
     real :: acc
@@ -66,7 +67,7 @@ contains
       blob(a, 10) = 0.
 
 
-      do b=1,n+n_ghosts
+      do b=1,n+ng
         cs_b = blob(b, 8)
         vb = blob(b, 2)
         rb = blob(b, 1)
@@ -102,7 +103,12 @@ contains
 
           term_3 = (pr_a + vis_a)/rho_a**2
 
-          du_dt = m_b*term_3*v_ab*d_wa
+          if (gamma>1.) then
+            du_dt = m_b*term_3*v_ab*d_wa
+          else
+            du_dt = 0
+
+          endif
 
         else
           acc = 0
