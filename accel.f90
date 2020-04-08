@@ -45,7 +45,6 @@ contains
     real, intent(inout) :: blob(:,:)
     integer, intent(in) :: n, ng
     real, intent(out) :: dt_new
-    real, parameter :: alpha = 2, beta = 1
 
     integer :: a, b
     real :: acc
@@ -92,6 +91,9 @@ contains
           vis_a = viscosity(rho_a, v_ab, u_vec, v_sig_a)
           vis_b = viscosity(rho_b, v_ab, u_vec, v_sig_b)
 
+          vis_a = vis_a*viscosity_yes_or_no
+          vis_b = vis_b*viscosity_yes_or_no
+
           term_a = (pr_a + vis_a)/(rho_a**2)
           term_b = (pr_b + vis_b)/(rho_b**2)
 
@@ -99,7 +101,6 @@ contains
           d_wb = (1./(h_b**2))*d_kernal(q_b)*u_vec
 
           acc = -1*m_b*(term_a*d_wa + term_b*d_wb)
-
 
           term_3 = (pr_a + vis_a)/rho_a**2
 

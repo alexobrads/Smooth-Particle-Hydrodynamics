@@ -41,7 +41,7 @@ contains
       blob(i, 4) = 1.2*dx
       blob(i, 5) = 1.
       blob(i, 6) = 0.
-      blob(i, 7) = 1.
+      blob(i, 7) = 1
       blob(i, 8) = 1.
       blob(i, 9) = 0.
       blob(i, 10) = 0.
@@ -54,9 +54,8 @@ contains
   subroutine setup_tube(blob, n)
     integer, intent(out) :: n
     real, intent(inout) :: blob(:,:)
-    integer :: i, n_l, n_r
     real :: x, rho_l, rho_r, dx_l, dx_r
-    real :: middle, xmax, xmin, mass, pr, pl, ss
+    real :: mass, pr, pl, ss
     real :: u_l, u_r, start, shock, end, new_start
     integer :: global_count, count_left, new_count_left
     integer :: count_right, new_count_right
@@ -225,7 +224,7 @@ contains
     character(len=100) :: filename
     integer :: j
 
-    write(filename, "(a,i5.5)") 'snap_',icount
+    write(filename, "(a,i5.5)") 'snap',icount
 
     open(1, file=filename, status='replace')
     write(1,*) '# x, v_x, m, sl, rho, u, P, ss, a, du_dt'

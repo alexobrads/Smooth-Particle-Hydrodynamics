@@ -40,17 +40,10 @@ contains
         r_b = blob(b,1)
 
         rho = 0
-
         q = abs(r_a - r_b)/h_a
 
         rho = m_b*(1./h_a)*kernal(q)
-
         blob(a, 5) = blob(a, 5) + rho
-
-        ! if (a>549 .and. a<551) then
-        !
-        !   print*, a, b ,(r_b - r_a) , r_a, r_b, rho, blob(a, 5)
-        ! end if
 
 
       enddo

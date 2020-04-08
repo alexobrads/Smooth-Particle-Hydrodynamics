@@ -1,0 +1,25 @@
+
+This code is used to apply the SPH method to three common fluid setups
+
+
+The memory file contains the parameters used for each set up.
+to run each set up with out changing the code, comment/uncomment the
+block definitions for the different problems in memory
+there are a few options are each problem, aka if a variable smoothing length
+is used or if viscosity is included. Please read how to use these in the memory.
+
+There is also some saved splash setting for both the isothermal shock tube and
+the sod shock tube. To use these firs run the code by
+
+make clean
+make
+./run
+
+splash snap* -p iso.
+
+or
+
+splash snap* -p sod.
+
+
+they can then be plotted by using the saved multiplot settings 11
