@@ -1,12 +1,44 @@
 
-This code is used to apply the SPH method to three common fluid setups
+This code is used to apply the SPH method to three common fluid problems
 
 
-The memory file contains the parameters used for each set up.
+HOW TO USE:
+
+The mem.f90 file contains the parameters used for each set up.
 to run each set up with out changing the code, comment/uncomment the
-block definitions for the different problems in memory
-there are a few options are each problem, aka if a variable smoothing length
-is used or if viscosity is included. Please read how to use these in the memory.
+problem block definitions for the different problems in mem.f90
+there are a few options for each problem, aka if a variable smoothing length
+is used or if viscosity is included. Please read how to use these in the mem.f90 file
+ore instructions are listed
+
+once that is set you can run the code using
+make
+./run 
+
+STRUCTURE:
+utils.f90
+contains output and the setup routines
+
+accel.f90
+contains the acceleration, derivative of the kernal and the viscosity routines
+
+density.f90
+contains the density calculation and the kernal subroutine
+
+derivs.f90
+Is a subroutine that calls calculations with a variable or non varying smoothing length
+
+eos.f90
+contains the isothermal and adiabatic equations of sate
+
+ghosts.f90
+contains the subroutine for setting ghosts
+
+step.f90
+contains the time stepping routine
+
+
+
 
 There is also some saved splash setting for both the isothermal shock tube and
 the sod shock tube. To use these firs run the code by

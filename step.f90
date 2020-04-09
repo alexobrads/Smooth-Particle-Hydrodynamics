@@ -16,6 +16,7 @@ module stepping
   real :: du_dt_0(n_max), du_dt_1(n_max)
 
 contains
+  
   subroutine do_step(blob, n, ng, dt, dt_new)
     real, intent(inout) :: blob(:,:)
     real, intent(in) :: dt

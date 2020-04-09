@@ -26,8 +26,8 @@ program SPH_method
   do while (time < tmax)
     i = i + 1
     call do_step(blob, n, ng, dt, dt_new)
-    dt = dt_new
     time = time + dt
+    dt = dt_new
     t(i) = time
     ke(i) = sum(0.5*blob(:n, 2) + blob(:n, 2)**2)
 

@@ -88,11 +88,17 @@ contains
           v_sig_a = alpha*cs_a - beta*v_ab*u_vec
           v_sig_b = alpha*cs_b - beta*v_ab*u_vec
 
-          vis_a = viscosity(rho_a, v_ab, u_vec, v_sig_a)
-          vis_b = viscosity(rho_b, v_ab, u_vec, v_sig_b)
+          if (viscosity_yes_or_no > 0.5) then
 
-          vis_a = vis_a*viscosity_yes_or_no
-          vis_b = vis_b*viscosity_yes_or_no
+            vis_a = viscosity(rho_a, v_ab, u_vec, v_sig_a)
+            vis_b = viscosity(rho_b, v_ab, u_vec, v_sig_b)
+
+          else
+            vis_a = 0
+            vis_b = 0
+
+          endif 
+
 
           term_a = (pr_a + vis_a)/(rho_a**2)
           term_b = (pr_b + vis_b)/(rho_b**2)
