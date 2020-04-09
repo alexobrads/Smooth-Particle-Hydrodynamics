@@ -36,7 +36,7 @@ module memory
 
 
 !__________________________________________________________________________________
-  !for shock tube
+  !for shock tube QUESTIOS 2
   ! real, parameter :: problem = 2.1!dont change this, picks setup for problem
   ! !setup parameters
   !
@@ -62,7 +62,7 @@ module memory
 
 
 !__________________________________________________________________________________
-  ! !for sod shock tube
+  ! !for sod shock tube QUESTIONS 3
   ! real, parameter :: problem = 3.!dont change this, picks setup for problem
   ! !setup parameters
   ! real, parameter :: x_min = -1.
