@@ -1,5 +1,11 @@
 
-This code is used to apply the SPH method to three common fluid problems
+This code performs the following. 
+
+1. Solves the equations of hydrodynamics using the one dimensional Smoothed Particle Hydrodynamics method.
+
+2. Solves for the propagation of a one dimensional isothermal linear wave.
+
+3. Solves the Sod shock tube problem and compares the results to the exact solution.
 
 
 HOW TO USE:
@@ -37,10 +43,7 @@ contains the subroutine for setting ghosts
 step.f90
 contains the time stepping routine
 
-
-
-
-There is also some saved splash setting for both the isothermal shock tube and
+There aresaved splash settings for both the isothermal shock tube and
 the sod shock tube. To use these first run the code by the following
 
 make clean
