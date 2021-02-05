@@ -7,21 +7,16 @@ This code performs the following.
 
 3. Solves the Sod shock tube problem and compares the results to the exact solution.
 
+STRUCTURE:
 
-HOW TO USE:
-
-The mem.f90 file contains the parameters used for each set up.
-to run each set up with out changing the code, comment/uncomment the
+mem.f90
+contains the parameters used for each set up. 
+To run each set up with out changing the code, comment/uncomment the
 problem block definitions for the different problems in mem.f90
 there are a few options for each problem, aka if a variable smoothing length
-is used or if viscosity is included. Please read how to use these in the mem.f90 file
-ore instructions are listed
+is used or if viscosity is included. Please read how to use these in the mem.f90
+file where instructions are listed.
 
-once that is set you can run the code using
-make
-./run 
-
-STRUCTURE:
 utils.f90
 contains output and the setup routines
 
@@ -43,12 +38,19 @@ contains the subroutine for setting ghosts
 step.f90
 contains the time stepping routine
 
-There aresaved splash settings for both the isothermal shock tube and
-the sod shock tube. To use these first run the code by the following
+
+.defaults and .limits 
+These are saved splash settings for both the isothermal shock tube and
+the sod shock tube.
+
+
+HOW TO USE:
 
 make clean
 make
 ./run
+
+PLOTTING:
 
 splash snap* -p iso.
 
@@ -57,4 +59,4 @@ or
 splash snap* -p sod.
 
 
-solutions can then be plotted by using the saved multiplot settings 11
+solutions can then be plotted by using the saved multiplot setting 11 in splash
