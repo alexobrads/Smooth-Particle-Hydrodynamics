@@ -41,7 +41,7 @@ contains the time stepping routine
 
 
 There is also some saved splash setting for both the isothermal shock tube and
-the sod shock tube. To use these firs run the code by
+the sod shock tube. To use these first run the code by the following
 
 make clean
 make
@@ -54,4 +54,4 @@ or
 splash snap* -p sod.
 
 
-they can then be plotted by using the saved multiplot settings 11
+solutions can then be plotted by using the saved multiplot settings 11
